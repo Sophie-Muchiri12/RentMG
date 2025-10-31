@@ -2,36 +2,136 @@ package com.example.rentmg.auth
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import com.example.rentmg.R
 
 class SignUpActivity : AppCompatActivity() {
 
+    private lateinit var firstNameInput: EditText
+    private lateinit var lastNameInput: EditText
+    private lateinit var usernameInput: EditText
+    private lateinit var emailInput: EditText
+    private lateinit var phoneInput: EditText
+    private lateinit var userTypeSpinner: Spinner
+    private lateinit var passwordInput: EditText
+    private lateinit var passwordConfirmInput: EditText
+    private lateinit var signUpButton: Button
+    private lateinit var signInText: TextView
+    
+    private var selectedUserType: String = "landlord" // Default
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+        supportActionBar?.hide()
 
-        val firstNameInput = findViewById<EditText>(R.id.first_name_input)
-        val lastNameInput = findViewById<EditText>(R.id.last_name_input)
-        val emailInput = findViewById<EditText>(R.id.email_input)
-        val passwordInput = findViewById<EditText>(R.id.password_input)
-        val signUpButton = findViewById<Button>(R.id.sign_up_button)
+        initViews()
+        setupUserTypeSpinner()
+        setupListeners()
+    }
 
-        signUpButton.setOnClickListener {
-            val firstName = firstNameInput.text.toString()
-            val lastName = lastNameInput.text.toString()
-            val email = emailInput.text.toString()
-            val password = passwordInput.text.toString()
+    private fun initViews() {
+        firstNameInput = findViewById(R.id.first_name_input)
+        lastNameInput = findViewById(R.id.last_name_input)
+        usernameInput = findViewById(R.id.username_input)
+        emailInput = findViewById(R.id.email_input)
+        phoneInput = findViewById(R.id.phone_input)
+        userTypeSpinner = findViewById(R.id.user_type_spinner)
+        passwordInput = findViewById(R.id.password_input)
+        passwordConfirmInput = findViewById(R.id.password_confirm_input)
+        signUpButton = findViewById(R.id.sign_up_button)
+        signInText = findViewById(R.id.sign_in_text)
+    }
 
-            if (firstName.isNotEmpty() && lastName.isNotEmpty() && 
-                email.isNotEmpty() && password.isNotEmpty()) {
-                Toast.makeText(this, "Account Created!", Toast.LENGTH_SHORT).show()
-                finish()
-            } else {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+    private fun setupUserTypeSpinner() {
+        val userTypes = arrayOf("Landlord", "Property Manager", "Tenant")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, userTypes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        userTypeSpinner.adapter = adapter
+
+        userTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                selectedUserType = when (position) {
+                    0 -> "landlord"
+                    1 -> "property manager"
+                    2 -> "tenant"
+                    else -> "landlord"
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedUserType = "landlord"
             }
         }
+    }
+
+    private fun setupListeners() {
+        signUpButton.setOnClickListener {
+            validateAndSignUp()
+        }
+
+        signInText.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun validateAndSignUp() {
+        val firstName = firstNameInput.text.toString()
+        val lastName = lastNameInput.text.toString()
+        val username = usernameInput.text.toString()
+        val email = emailInput.text.toString()
+        val phone = phoneInput.text.toString()
+        val password = passwordInput.text.toString()
+        val passwordConfirm = passwordConfirmInput.text.toString()
+
+        // Validation
+        if (firstName.isEmpty()) {
+            Toast.makeText(this, "First name is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (lastName.isEmpty()) {
+            Toast.makeText(this, "Last name is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (username.isEmpty()) {
+            Toast.makeText(this, "Username is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Enter a valid email", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (phone.isEmpty()) {
+            Toast.makeText(this, "Phone is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password.length < 8) {
+            Toast.makeText(this, "Password must be at least 8 characters", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password != passwordConfirm) {
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // TODO: Make API call here with selectedUserType
+        Toast.makeText(this, "Account created as $selectedUserType!", Toast.LENGTH_LONG).show()
+        
+        // For now, just print the data
+        println("First Name: $firstName")
+        println("Last Name: $lastName")
+        println("Username: $username")
+        println("Email: $email")
+        println("Phone: $phone")
+        println("User Type: $selectedUserType")
+        println("Password: $password")
+
+        finish()
     }
 }

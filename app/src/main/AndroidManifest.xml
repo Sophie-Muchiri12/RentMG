@@ -34,6 +34,13 @@
             android:name=".dashboard.DashboardActivity"
             android:exported="false" />
         
+        <activity
+            android:name=".dashboard.home.HomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".dashboard.settings.SettingsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

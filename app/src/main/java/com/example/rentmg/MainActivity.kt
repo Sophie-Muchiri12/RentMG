@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        supportActionBar?.hide()
         val signInButton = findViewById<Button>(R.id.sign_in_button)
         val signUpButton = findViewById<Button>(R.id.sign_up_button)
 

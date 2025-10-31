@@ -166,6 +166,22 @@
                 android:inputType="phone" />
         </com.google.android.material.textfield.TextInputLayout>
 
+         <!-- User Type Spinner -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="I am a:"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/user_type_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
         <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/password_layout"
