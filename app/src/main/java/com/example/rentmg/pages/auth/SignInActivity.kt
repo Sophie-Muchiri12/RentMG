@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import android.view.View
 import com.example.rentmg.R
-import com.example.rentmg.dashboard.DashboardActivity
+import com.example.rentmg.pages.dashboard.DashboardActivity
 
 class SignInActivity : AppCompatActivity() {
 
@@ -62,24 +62,22 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun performSignIn() {
-        isLoading = true
-        signInButton.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
+    isLoading = true
+    signInButton.visibility = View.GONE
+    progressBar.visibility = View.VISIBLE
+    
+    signInButton.postDelayed({
+        val userType = "landlord"
         
-        // TODO: Make API call here
-        signInButton.postDelayed({
-            val userType = "landlord" // This should come from API response
-            
-            Toast.makeText(this, "Sign In Success!", Toast.LENGTH_SHORT).show()
-            
-            val intent = Intent(this, DashboardActivity::class.java)
-            intent.putExtra("USER_TYPE", userType)
-            startActivity(intent)
-            finish()
-            
-            isLoading = false
-            signInButton.visibility = View.VISIBLE
-            progressBar.visibility = View.GONE
-        }, 2000)
-    }
+        Toast.makeText(this, "Sign In Success!", Toast.LENGTH_SHORT).show()
+        
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.putExtra("USER_TYPE", userType)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+        
+        isLoading = false
+    }, 2000)
+}
 }

@@ -31,16 +31,17 @@
             android:exported="false" />
 
         <activity
-            android:name=".dashboard.DashboardActivity"
-            android:exported="false" />
+            android:name=".pages.dashboard.DashboardActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
         
         <activity
-            android:name=".dashboard.home.HomeActivity"
+            android:name=".pages.dashboard.home.HomeActivity"
             android:theme="@style/Theme.Material3.Light.NoActionBar"
             android:exported="false" />
 
         <activity
-            android:name=".dashboard.settings.SettingsActivity"
+            android:name=".pages.dashboard.settings.SettingsActivity"
             android:exported="false" />
     </application>
 

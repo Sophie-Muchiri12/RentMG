@@ -1,46 +1,40 @@
-package com.example.rentmg.dashboard.home
+package com.example.rentmg.pages.dashboard.home
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
 import com.example.rentmg.R
 
-class HomeActivity : AppCompatActivity() {
+class HomeFragment : Fragment() {
 
     private lateinit var welcomeText: TextView
     private lateinit var totalRentText: TextView
     private lateinit var unitsRentingText: TextView
     private lateinit var monthYearText: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_home, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         
-        // Enable edge-to-edge display
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        
-        setContentView(R.layout.activity_home)
-
-        supportActionBar?.hide()
-
-        // Handle status bar insets
-        findViewById<android.view.View>(android.R.id.content).setOnApplyWindowInsetsListener { view, insets ->
-            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
-            view.updatePadding(top = statusBarHeight)
-            insets
-        }
-
-        initViews()
+        initViews(view)
         loadData()
     }
 
-    private fun initViews() {
-        welcomeText = findViewById(R.id.welcome_text)
-        totalRentText = findViewById(R.id.total_rent_text)
-        unitsRentingText = findViewById(R.id.units_renting_text)
-        monthYearText = findViewById(R.id.month_year_text)
+    private fun initViews(view: View) {
+        welcomeText = view.findViewById(R.id.welcome_text)
+        totalRentText = view.findViewById(R.id.total_rent_text)
+        unitsRentingText = view.findViewById(R.id.units_renting_text)
+        monthYearText = view.findViewById(R.id.month_year_text)
     }
 
     private fun loadData() {
