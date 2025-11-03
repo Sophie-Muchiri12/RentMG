@@ -36,6 +36,7 @@
         
         <activity
             android:name=".dashboard.home.HomeActivity"
+            android:theme="@style/Theme.Material3.Light.NoActionBar"
             android:exported="false" />
 
         <activity

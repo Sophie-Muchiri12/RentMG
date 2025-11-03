@@ -3,6 +3,9 @@ package com.example.rentmg.dashboard.home
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.example.rentmg.R
 
 class HomeActivity : AppCompatActivity() {
@@ -14,9 +17,20 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Enable edge-to-edge display
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
         setContentView(R.layout.activity_home)
 
         supportActionBar?.hide()
+
+        // Handle status bar insets
+        findViewById<android.view.View>(android.R.id.content).setOnApplyWindowInsetsListener { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            view.updatePadding(top = statusBarHeight)
+            insets
+        }
 
         initViews()
         loadData()
@@ -30,16 +44,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
-        // TODO: Get user name from SharedPreferences or Intent
         val userName = "Griffin Otieno"
         welcomeText.text = "Welcome, $userName"
 
-        // // TODO: Get current month/year
-        // val currentMonth = getCurrentMonth()
-        // monthYearText.text = currentMonth
+        val currentMonth = getCurrentMonth()
+        monthYearText.text = currentMonth
 
-        // TODO: Fetch from API
-        // For now, use dummy data
         val totalRent = 150000.0
         val unitsRenting = 12
         val totalUnits = 15
