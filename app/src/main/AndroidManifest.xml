@@ -35,14 +35,19 @@
             android:exported="false"
             android:launchMode="singleTop" />
         
-        <activity
+        <!-- <activity
             android:name=".pages.dashboard.home.HomeActivity"
             android:theme="@style/Theme.Material3.Light.NoActionBar"
-            android:exported="false" />
+            android:exported="false" /> -->
 
         <activity
             android:name=".pages.dashboard.settings.SettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".pages.dashboard.TenantDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Light" />
     </application>
 
 </manifest>
