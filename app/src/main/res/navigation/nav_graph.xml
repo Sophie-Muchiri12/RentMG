@@ -25,4 +25,15 @@
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/CheckoutFragment"
+        android:name="com.example.rentmg.CheckoutFragment"
+        android:label="@string/checkout_fragment_label"
+        tools:layout="@layout/fragment_checkout">
+
+        <argument
+            android:name="rental_amount"
+            app:argType="float"
+            android:defaultValue="150.0" />
+    </fragment>
 </navigation>
