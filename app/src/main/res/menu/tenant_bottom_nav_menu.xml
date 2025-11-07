@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_home"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/credit_card_24dp_1f1f1f_fill0_wght400_grad0_opsz24"
+        android:title="History" />
+
+    <item
+        android:id="@+id/nav_receipts"
+        android:icon="@drawable/ic_receipt"
+        android:title="Receipts" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile" />
+
+</menu>

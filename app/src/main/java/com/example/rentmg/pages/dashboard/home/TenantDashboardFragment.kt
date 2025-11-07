@@ -1,5 +1,6 @@
 package com.example.rentmg.pages.dashboard
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.rentmg.R
+import com.example.rentmg.pages.payment.CheckoutActivity
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -217,10 +219,20 @@ class TenantDashboardFragment : Fragment() {
 
     private fun setupListeners() {
         btnProceedPayment.setOnClickListener {
-            // TODO: Navigate to payment screen
-            // findNavController().navigate(R.id.action_dashboard_to_payment)
-            println("Proceed to Payment clicked")
+            navigateToCheckout()
         }
+    }
+    
+    private fun navigateToCheckout() {
+        val intent = Intent(requireContext(), CheckoutActivity::class.java).apply {
+            putExtra("PROPERTY_NAME", tenant.propertyName)
+            putExtra("UNIT_NUMBER", tenant.houseNumber)
+            putExtra("RENT_AMOUNT", tenant.monthlyRent)
+            putExtra("TRANSACTION_FEE", 0.0)
+            putExtra("USER_NAME", tenant.name)
+            putExtra("USER_EMAIL", userEmail)
+        }
+        startActivity(intent)
     }
 
     private fun getGreeting(): String {
