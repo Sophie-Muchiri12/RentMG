@@ -1,5 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primary_red">#E53935</color>
+    <color name="primary_light">#FFEBEE</color>
+    <color name="background">#FAFAFA</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="semi_transparent_white">#4DFFFFFF</color>
+</resources>
+
+<!-- File: res/drawable/bg_rent_status_card.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/primary_red" />
+    <corners android:radius="16dp" />
+</shape>
+
+<!-- File: res/drawable/bg_badge.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/semi_transparent_white" />
+    <corners android:radius="20dp" />
+</shape>
+
+<!-- File: res/drawable/bg_button_payment.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false">
+        <shape>
+            <solid android:color="@color/text_primary" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#1A1A1A" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</selector>
+
+<!-- File: res/menu/bottom_nav_menu.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/ic_history"
+        android:title="History" />
+    <item
+        android:id="@+id/nav_receipts"
+        android:icon="@drawable/ic_receipt"
+        android:title="Receipts" />
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile" />
+</menu>
+
+<!-- File: res/values/themes.xml (or add to existing styles.xml) -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RentMG" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_red</item>
+        <item name="colorPrimaryVariant">@color/primary_light</item>
+        <item name="colorSecondary">@color/primary_red</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>
