@@ -40,9 +40,9 @@
             android:theme="@style/Theme.Material3.Light.NoActionBar"
             android:exported="false" /> -->
 
-        <activity
+        <!-- <activity
             android:name=".pages.dashboard.settings.SettingsActivity"
-            android:exported="false" />
+            android:exported="false" /> -->
 
         <activity
             android:name=".pages.dashboard.TenantDashboardActivity"
