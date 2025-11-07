@@ -12,37 +12,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
-        
+        <activity
+            android:name=".PropertyManagementActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
+        </activity>
+        <activity
+            android:name=".auth.SignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".auth.SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".pages.dashboard.DashboardActivity"
+            android:exported="true"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".auth.SignInActivity"
-            android:exported="false" />
-        
-        <activity
-            android:name=".auth.SignUpActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".pages.dashboard.DashboardActivity"
-            android:exported="false"
-            android:launchMode="singleTop" />
-        
-        <activity
-            android:name=".pages.dashboard.home.HomeActivity"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"
-            android:exported="false" />
-
-        <activity
-            android:name=".pages.dashboard.settings.SettingsActivity"
-            android:exported="false" />
     </application>
 
 </manifest>

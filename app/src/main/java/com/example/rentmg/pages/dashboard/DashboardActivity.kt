@@ -1,15 +1,21 @@
 package com.example.rentmg.pages.dashboard
 
 import android.os.Bundle
+import android.content.Intent
+//import com.example.rentmg.PropertyManagementActivity
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.setPadding
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import com.example.rentmg.R
 import com.example.rentmg.pages.dashboard.home.HomeFragment
 import com.example.rentmg.pages.dashboard.settings.SettingsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.rentmg.pages.dashboard.PropertiesFragment
+
 
 class DashboardActivity : AppCompatActivity() {
     
@@ -25,11 +31,12 @@ class DashboardActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        findViewById<android.view.View>(android.R.id.content).setOnApplyWindowInsetsListener { view, insets ->
-            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
-            view.updatePadding(top = statusBarHeight)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
 
         userType = intent.getStringExtra("USER_TYPE") ?: "landlord"
 
@@ -59,6 +66,7 @@ class DashboardActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_properties -> {
+                    loadFragment(PropertiesFragment())
                     true
                 }
                 R.id.nav_billing -> {
