@@ -1,9 +1,12 @@
 package com.example.rentmg.auth
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.*
 import com.example.rentmg.R
+import com.example.rentmg.pages.dashboard.DashboardActivity
+import com.example.rentmg.pages.dashboard.TenantDashboardActivity
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -17,7 +20,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var passwordConfirmInput: EditText
     private lateinit var signUpButton: Button
     private lateinit var signInText: TextView
-    
+
     private var selectedUserType: String = "landlord" // Default
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +56,7 @@ class SignUpActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                 selectedUserType = when (position) {
                     0 -> "landlord"
-                    1 -> "property manager"
+                    1 -> "property_manager"
                     2 -> "tenant"
                     else -> "landlord"
                 }
@@ -120,18 +123,49 @@ class SignUpActivity : AppCompatActivity() {
             return
         }
 
-        // TODO: Make API call here with selectedUserType
-        Toast.makeText(this, "Account created as $selectedUserType!", Toast.LENGTH_LONG).show()
-        
-        // For now, just print the data
+        // TODO: Make API call with selectedUserType
+        performSignUp(firstName, lastName, username, email, phone, password)
+    }
+
+    private fun performSignUp(
+        firstName: String,
+        lastName: String,
+        username: String,
+        email: String,
+        phone: String,
+        password: String
+    ) {
+        // Log the data for debugging
+        println("=== SIGN UP DATA ===")
         println("First Name: $firstName")
         println("Last Name: $lastName")
         println("Username: $username")
         println("Email: $email")
         println("Phone: $phone")
         println("User Type: $selectedUserType")
-        println("Password: $password")
+        println("==================")
 
+        Toast.makeText(this, "Account created as $selectedUserType!", Toast.LENGTH_LONG).show()
+
+        // Navigate to appropriate dashboard based on selected user type
+        navigateToDashboard(selectedUserType, firstName, email)
+    }
+
+    private fun navigateToDashboard(userType: String, firstName: String, email: String) {
+        val intent = when (userType) {
+            "tenant" -> Intent(this, TenantDashboardActivity::class.java)
+            "property_manager" -> Intent(this, DashboardActivity::class.java)
+            else -> Intent(this, DashboardActivity::class.java) // Landlord
+        }
+
+        // Pass user information to dashboard
+        intent.putExtra("USER_TYPE", userType)
+        intent.putExtra("USER_NAME", firstName)
+        intent.putExtra("USER_EMAIL", email)
+
+        // Clear back stack so user can't navigate back
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
     }
 }
