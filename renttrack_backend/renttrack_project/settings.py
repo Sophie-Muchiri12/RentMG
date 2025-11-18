@@ -3,6 +3,10 @@ pymysql.install_as_MySQLdb()
 from dotenv import load_dotenv
 load_dotenv()
 import os
+
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Replace 'renttrack' with your actual app name
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -129,3 +133,21 @@ DATABASES = {
         },
     }
 }
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+
+# Where collected static files will be stored (for production)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Directories Django will look in for static files during development
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+ROOT_URLCONF = 'renttrack_backend.urls'
