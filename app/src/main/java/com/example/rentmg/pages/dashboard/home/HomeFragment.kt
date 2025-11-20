@@ -248,7 +248,7 @@ class HomeFragment : Fragment() {
 
         // Fetch units for each property
         for (property in properties) {
-            AppManager.getApiService().listUnits(property.id).enqueue(object : Callback<List<Unit>> {
+            AppManager.getApiService().listUnitsByProperty(property.id).enqueue(object : Callback<List<Unit>> {
                 override fun onResponse(call: Call<List<Unit>>, response: Response<List<Unit>>) {
                     if (response.isSuccessful) {
                         val units = response.body()

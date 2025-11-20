@@ -17,6 +17,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".auth.SignInActivity"
@@ -40,6 +44,16 @@
 
         <activity
             android:name=".pages.dashboard.TenantDashboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Light" />
+
+        <activity
+            android:name=".pages.payment.CheckoutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Material3.Light" />
+
+        <activity
+            android:name=".pages.PropertyDetailsActivity"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light" />
     </application>

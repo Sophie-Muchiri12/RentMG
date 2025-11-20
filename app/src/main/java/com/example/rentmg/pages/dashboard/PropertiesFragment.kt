@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rentmg.R
 import com.example.rentmg.data.model.Property
 import com.example.rentmg.data.model.PropertyCreateRequest
-import com.example.rentmg.data.model.PropertyResponse
 import com.example.rentmg.util.AppManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.*
@@ -278,13 +277,13 @@ class PropertiesFragment : Fragment() {
         )
 
         // Send POST request to create property
-        AppManager.getApiService().createProperty(request).enqueue(object : Callback<PropertyResponse> {
-            override fun onResponse(call: Call<PropertyResponse>, response: Response<PropertyResponse>) {
+        AppManager.getApiService().createProperty(request).enqueue(object : Callback<Property> {
+            override fun onResponse(call: Call<Property>, response: Response<Property>) {
                 if (response.isSuccessful) {
                     // Property created successfully
-                    val propertyResponse = response.body()
+                    val property = response.body()
 
-                    if (propertyResponse != null && propertyResponse.property != null) {
+                    if (property != null) {
                         // Show success message
                         Toast.makeText(
                             requireContext(),
@@ -293,7 +292,7 @@ class PropertiesFragment : Fragment() {
                         ).show()
 
                         // Add new property to list
-                        properties.add(propertyResponse.property)
+                        properties.add(property)
 
                         // Notify adapter
                         propertiesAdapter.notifyItemInserted(properties.size - 1)
@@ -316,7 +315,7 @@ class PropertiesFragment : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<PropertyResponse>, t: Throwable) {
+            override fun onFailure(call: Call<Property>, t: Throwable) {
                 // Network error
                 Toast.makeText(
                     requireContext(),
@@ -334,23 +333,10 @@ class PropertiesFragment : Fragment() {
      * @param property The clicked property
      */
     private fun onPropertyClicked(property: Property) {
-        // TODO: Navigate to property details screen
-        // This should show:
-        // - Property information (name, address)
-        // - List of units in this property
-        // - Option to add new unit
-        // - Option to edit/delete property
-
-        // For now, show a toast
-        Toast.makeText(
-            requireContext(),
-            "Property: ${property.name}\nAddress: ${property.address}",
-            Toast.LENGTH_LONG
-        ).show()
-
-        // Future implementation:
-        // val action = PropertiesFragmentDirections.actionPropertiesToPropertyDetails(property.id)
-        // findNavController().navigate(action)
+        // Navigate to property details screen
+        val intent = android.content.Intent(requireContext(), com.example.rentmg.pages.PropertyDetailsActivity::class.java)
+        intent.putExtra("PROPERTY_ID", property.id)
+        startActivity(intent)
     }
 
     /**

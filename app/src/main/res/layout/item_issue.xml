@@ -16,24 +16,23 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Tenant and Unit Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tv_tenant_id"
+                android:id="@+id/tv_issue_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tenant ID: 123"
+                android:text="Issue Title"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
 
             <TextView
-                android:id="@+id/tv_lease_status"
+                android:id="@+id/tv_issue_priority"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_badge_available"
@@ -41,29 +40,34 @@
                 android:paddingEnd="12dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
-                android:text="ACTIVE"
-                android:textSize="12sp"
+                android:text="HIGH"
+                android:textSize="11sp"
                 android:textColor="@android:color/white" />
         </LinearLayout>
 
-        <!-- Unit ID -->
         <TextView
-            android:id="@+id/tv_unit_id"
+            android:id="@+id/tv_issue_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Unit ID: 456"
+            android:text="Issue description"
             android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-        <!-- Lease Date -->
         <TextView
-            android:id="@+id/tv_lease_date"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_issue_status"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Start: 2024-01-01"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:layout_marginTop="8dp"
+            android:background="@drawable/status_badge_available"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:text="OPEN"
+            android:textSize="12sp"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
