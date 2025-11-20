@@ -21,7 +21,7 @@ python manage.py
 - `GET  /api/payments/history?lease_id=` (list payments)
 
 
-- `POST /api/auth/register` {email,password,role(landlord|tenant),full_name}
+- `POST /api/auth/register` {email,password,role(landlord|tenant),full_name, property_name, property_address?}
 - `POST /api/auth/login` -> {access_token}
 - `GET  /api/properties/` (landlord lists own)
 - `POST /api/properties/` (landlord create)

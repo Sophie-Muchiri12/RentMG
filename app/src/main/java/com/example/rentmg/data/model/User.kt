@@ -30,6 +30,14 @@ data class User(
     @SerializedName("full_name")
     val fullName: String?,
 
+    // Property the user is associated with (for tenants/initial landlord property)
+    @SerializedName("property_id")
+    val propertyId: Int?,
+
+    // Friendly property name (if available)
+    @SerializedName("property_name")
+    val propertyName: String?,
+
     // Timestamp when user was created (ISO 8601 format)
     @SerializedName("created_at")
     val createdAt: String?,
@@ -47,6 +55,8 @@ data class User(
  * @property password User's password (will be hashed by backend)
  * @property role User's role (landlord, property_manager, or tenant)
  * @property fullName User's full name
+ * @property propertyName Property to create (landlord) or match (tenant)
+ * @property propertyAddress Property address when creating landlord profile
  */
 data class RegisterRequest(
     // Email address for login
@@ -63,7 +73,15 @@ data class RegisterRequest(
 
     // User's full name
     @SerializedName("full_name")
-    val fullName: String
+    val fullName: String,
+
+    // Property name (required for landlord and tenant sign-up)
+    @SerializedName("property_name")
+    val propertyName: String?,
+
+    // Property address (required for landlord sign-up)
+    @SerializedName("property_address")
+    val propertyAddress: String?
 )
 
 /**

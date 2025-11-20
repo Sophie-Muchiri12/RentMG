@@ -30,7 +30,7 @@ interface ApiService {
      * Register endpoint
      * Creates a new user account
      *
-     * @param body RegisterRequest with email, password, role, and full name
+     * @param body RegisterRequest with email, password, role, full name, and optional property info
      * @return RegisterResponse with new user info
      * @throws 400 if email already exists or validation fails
      */

@@ -11,7 +11,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker, Session
 
 from app.config import Config
@@ -40,6 +40,8 @@ def _user_payload(user: User):
         "email": user.email,
         "role": user.role,
         "full_name": user.full_name,
+        "property_id": user.property_id,
+        "property_name": user.linked_property.name if user.linked_property else None,
         "created_at": user.created_at.isoformat(timespec="seconds") if user.created_at else None,
         "updated_at": user.updated_at.isoformat(timespec="seconds") if user.updated_at else None,
     }
@@ -146,6 +148,8 @@ class RegisterBody(BaseModel):
     password: str
     role: str = "tenant"
     full_name: Optional[str] = None
+    property_name: Optional[str] = None
+    property_address: Optional[str] = None
 
 
 class LoginBody(BaseModel):
@@ -213,15 +217,51 @@ app.add_middleware(
 # ----------------------------
 @app.post("/api/auth/register")
 def register(payload: RegisterBody, db: Session = Depends(get_db)):
+    role = (payload.role or "tenant").lower()
+    if role not in ("tenant", "landlord", "property_manager"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="role must be tenant, landlord, or property_manager")
+    property_name = (payload.property_name or "").strip()
+    property_address = (payload.property_address or "").strip()
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="email exists")
+
+    selected_property = None
+    if role == "tenant":
+        if not property_name:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="property_name required for tenant signup")
+        matches = db.query(Property).filter(func.lower(Property.name) == property_name.lower()).all()
+        if not matches:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="property not found")
+        if len(matches) > 1:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="multiple properties share that name; please provide a unique name")
+        selected_property = matches[0]
+    elif role == "landlord":
+        if not property_name:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="property_name required to create landlord profile")
+        if not property_address:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="property_address required to create landlord profile")
+
     user = User(
         email=payload.email,
         password_hash=hash_password(payload.password),
-        role=payload.role,
+        role=role,
         full_name=payload.full_name,
+        property_id=selected_property.id if selected_property else None,
     )
     db.add(user)
+    db.flush()  # populate user.id for property creation
+
+    if role == "landlord":
+        new_prop = Property(
+            name=property_name,
+            address=property_address or None,
+            landlord_id=user.id,
+        )
+        db.add(new_prop)
+        db.flush()
+        user.property_id = new_prop.id
+        selected_property = new_prop
+
     db.commit()
     db.refresh(user)
     token = create_token(user)
@@ -243,6 +283,35 @@ def me(identity=Depends(get_identity), db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return _user_payload(user)
+
+
+@app.get("/")
+def index():
+    return {
+        "message": "RentMG backend is running",
+        "docs": ["/api/auth/register", "/api/auth/login", "/api/auth/me"],
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/favicon.ico", status_code=204)
+def favicon():
+    # Ignore browser favicon requests to silence 404 noise
+    return None
+
+
+@app.get("/docs-info")
+def docs_info():
+    return {
+        "message": "FastAPI auto-docs live at /docs and /redoc",
+        "swagger_ui": "/docs",
+        "redoc": "/redoc",
+        "api_base": "/api",
+    }
 
 
 # ----------------------------

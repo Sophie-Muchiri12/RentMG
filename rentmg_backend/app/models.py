@@ -13,6 +13,8 @@ class User(BaseModel):
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), default="tenant")  # landlord or tenant
     full_name = db.Column(db.String(120))
+    property_id = db.Column(db.Integer, db.ForeignKey("properties.id"), nullable=True)
+    linked_property = db.relationship("Property", foreign_keys=[property_id], backref="linked_users")
 
 class Property(BaseModel):
     __tablename__ = "properties"

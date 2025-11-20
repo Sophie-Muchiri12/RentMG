@@ -337,15 +337,18 @@ http://localhost:5000/api
 ```
 
 #### POST /auth/register
-**Description**: Create new user account
+**Description**: Create new user account  
+Landlords must provide `property_name` + `property_address` to seed their first property. Tenants must provide `property_name` so the system can attach them to an existing landlord property by name.
 
-**Request Body**:
+**Request Body (landlord example)**:
 ```json
 {
-  "email": "newuser@example.com",
+  "email": "owner@example.com",
   "password": "password123",
-  "role": "tenant",
-  "full_name": "Jane Smith"
+  "role": "landlord",
+  "full_name": "Jane Smith",
+  "property_name": "Sunset Villas",
+  "property_address": "123 Main Street, Nairobi"
 }
 ```
 
@@ -355,14 +358,17 @@ http://localhost:5000/api
   "message": "User registered successfully",
   "user": {
     "id": 2,
-    "email": "newuser@example.com",
-    "role": "tenant",
+    "email": "owner@example.com",
+    "role": "landlord",
     "full_name": "Jane Smith",
+    "property_id": 10,
+    "property_name": "Sunset Villas",
     "created_at": "2025-01-15T11:00:00",
     "updated_at": "2025-01-15T11:00:00"
   }
 }
 ```
+Tenant signup uses the same payload with `"role": "tenant"` and `property_name` pointing to an existing property (address optional).
 
 ### Lease Endpoints
 

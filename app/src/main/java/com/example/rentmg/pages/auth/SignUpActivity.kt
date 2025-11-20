@@ -13,6 +13,7 @@ import com.example.rentmg.util.AppManager
 import com.example.rentmg.pages.dashboard.DashboardActivity
 import com.example.rentmg.pages.dashboard.TenantDashboardActivity
 import retrofit2.*
+import com.google.android.material.textfield.TextInputLayout
 
 /**
  * SignUpActivity
@@ -34,6 +35,10 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var usernameInput: EditText
     private lateinit var emailInput: EditText
     private lateinit var phoneInput: EditText
+    private lateinit var propertyNameInput: EditText
+    private lateinit var propertyAddressInput: EditText
+    private lateinit var propertyNameLayout: TextInputLayout
+    private lateinit var propertyAddressLayout: TextInputLayout
     private lateinit var userTypeSpinner: Spinner
     private lateinit var passwordInput: EditText
     private lateinit var passwordConfirmInput: EditText
@@ -79,6 +84,10 @@ class SignUpActivity : AppCompatActivity() {
         usernameInput = findViewById(R.id.username_input)
         emailInput = findViewById(R.id.email_input)
         phoneInput = findViewById(R.id.phone_input)
+        propertyNameInput = findViewById(R.id.property_name_input)
+        propertyAddressInput = findViewById(R.id.property_address_input)
+        propertyNameLayout = findViewById(R.id.property_name_layout)
+        propertyAddressLayout = findViewById(R.id.property_address_layout)
         userTypeSpinner = findViewById(R.id.user_type_spinner)
         passwordInput = findViewById(R.id.password_input)
         passwordConfirmInput = findViewById(R.id.password_confirm_input)
@@ -113,6 +122,7 @@ class SignUpActivity : AppCompatActivity() {
                     2 -> "tenant"            // Tenant option
                     else -> "landlord"       // Fallback
                 }
+                updatePropertyFieldVisibility()
             }
 
             /**
@@ -121,6 +131,36 @@ class SignUpActivity : AppCompatActivity() {
              */
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 selectedUserType = "landlord"
+                updatePropertyFieldVisibility()
+            }
+        }
+
+        // Ensure UI matches default selection on load
+        updatePropertyFieldVisibility()
+    }
+
+    /**
+     * Shows or hides property-related fields based on selected role.
+     * Landlords: property name + address required.
+     * Tenants: property name required to auto-link to landlord.
+     * Others: hide property fields.
+     */
+    private fun updatePropertyFieldVisibility() {
+        when (selectedUserType) {
+            "landlord" -> {
+                propertyNameLayout.visibility = View.VISIBLE
+                propertyAddressLayout.visibility = View.VISIBLE
+            }
+            "tenant" -> {
+                propertyNameLayout.visibility = View.VISIBLE
+                propertyAddressLayout.visibility = View.GONE
+                propertyAddressInput.setText("")
+            }
+            else -> {
+                propertyNameLayout.visibility = View.GONE
+                propertyAddressLayout.visibility = View.GONE
+                propertyNameInput.setText("")
+                propertyAddressInput.setText("")
             }
         }
     }
@@ -206,8 +246,35 @@ class SignUpActivity : AppCompatActivity() {
             return
         }
 
+        val propertyName = propertyNameInput.text.toString().trim()
+        val propertyAddress = propertyAddressInput.text.toString().trim()
+
+        // Landlords must supply property name and address for initial listing
+        if (selectedUserType == "landlord") {
+            if (propertyName.isEmpty()) {
+                Toast.makeText(this, "Property name is required for landlord signup", Toast.LENGTH_SHORT).show()
+                return
+            }
+            if (propertyAddress.isEmpty()) {
+                Toast.makeText(this, "Property address is required for landlord signup", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+
+        // Tenants must supply the landlord's property name to auto-link
+        if (selectedUserType == "tenant" && propertyName.isEmpty()) {
+            Toast.makeText(this, "Please enter your landlord's property name", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val propertyNameArg = when (selectedUserType) {
+            "landlord", "tenant" -> propertyName
+            else -> null
+        }
+        val propertyAddressArg = if (selectedUserType == "landlord") propertyAddress else null
+
         // All validation passed, proceed with registration
-        performSignUp(firstName, lastName, email, password)
+        performSignUp(firstName, lastName, email, password, propertyNameArg, propertyAddressArg)
     }
 
     /**
@@ -223,7 +290,9 @@ class SignUpActivity : AppCompatActivity() {
         firstName: String,
         lastName: String,
         email: String,
-        password: String
+        password: String,
+        propertyName: String?,
+        propertyAddress: String?
     ) {
         // Set loading state
         isLoading = true
@@ -240,7 +309,9 @@ class SignUpActivity : AppCompatActivity() {
             email = email,
             password = password,
             role = selectedUserType,
-            fullName = fullName
+            fullName = fullName,
+            propertyName = propertyName,
+            propertyAddress = propertyAddress
         )
 
         // Make API call to register endpoint using global API service
