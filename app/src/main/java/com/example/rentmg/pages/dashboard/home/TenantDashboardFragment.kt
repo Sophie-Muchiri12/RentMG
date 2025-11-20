@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.rentmg.R
 import com.example.rentmg.data.model.Lease
+import com.example.rentmg.data.model.Payment
 import com.example.rentmg.data.model.Property
 import com.example.rentmg.data.model.Unit
 import com.example.rentmg.pages.payment.CheckoutActivity
@@ -93,12 +94,15 @@ class TenantDashboardFragment : Fragment() {
     private var currentLease: Lease? = null
     private var currentUnit: Unit? = null
     private var currentProperty: Property? = null
+    private var lastPayment: Payment? = null
+    private var isRentPaid: Boolean = false
 
     // ============================================
     // DATA - Formatters
     // ============================================
     private lateinit var dateFormat: SimpleDateFormat
     private lateinit var currencyFormat: NumberFormat
+    private lateinit var isoDateParser: SimpleDateFormat
 
     // ============================================
     // DATA - User Information
@@ -199,9 +203,11 @@ class TenantDashboardFragment : Fragment() {
     private fun initializeFormatters() {
         // Date formatter for Kenyan locale (e.g., "15 Jan 2025")
         dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        isoDateParser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
         // Currency formatter for Kenyan Shillings (e.g., "KES 25,000.00")
         currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "KE"))
+        currencyFormat.currency = Currency.getInstance("KES")
     }
 
     /**
@@ -267,68 +273,87 @@ class TenantDashboardFragment : Fragment() {
      * @param unitId ID of the unit to fetch
      */
     private fun loadUnitData(unitId: Int) {
-        // Note: The current backend doesn't have a single unit endpoint
-        // So we'll fetch all units for the property and filter
-        // In production, you should add GET /api/units/{id} endpoint
+        AppManager.getApiService().getUnit(unitId).enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful) {
+                    currentUnit = response.body()
+                    val propertyId = currentUnit?.propertyId
+                    if (propertyId != null) {
+                        loadPropertyData(propertyId)
+                    } else {
+                        showError("Unit is missing property information.")
+                    }
+                } else {
+                    showError("Failed to load unit data: ${response.code()}")
+                }
+            }
 
-        if (currentLease == null) return
-
-        // For now, we'll load the unit data when we load the property
-        // and match by unit ID
-        // Let's assume we can get property ID from the lease somehow
-        // Since the backend returns unit_id in lease, we need to fetch units by property
-
-        // Temporary workaround: Fetch all properties and find the one containing this unit
-        // In production, add a GET /api/units/{id} endpoint that returns unit with property_id
-        loadPropertyDataForUnit(unitId)
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                showError("Network error: ${t.message}")
+            }
+        })
     }
 
     /**
-     * Loads property data for a unit
-     * Workaround method until GET /api/units/{id} endpoint is added
+     * Loads property data from backend API
      *
-     * @param unitId ID of the unit
+     * @param propertyId ID of the property to fetch
      */
-    private fun loadPropertyDataForUnit(unitId: Int) {
-        // Fetch all properties (landlord endpoint, but we'll try)
-        // Alternatively, we can add a tenant-specific endpoint
-        // For now, let's use mock data with the lease information
+    private fun loadPropertyData(propertyId: Int) {
+        AppManager.getApiService().getProperty(propertyId).enqueue(object : Callback<Property> {
+            override fun onResponse(call: Call<Property>, response: Response<Property>) {
+                if (response.isSuccessful) {
+                    currentProperty = response.body()
+                    // Load latest payment after property is available
+                    loadLastPayment()
+                } else {
+                    showError("Failed to load property: ${response.code()}")
+                }
+            }
 
-        // TEMPORARY: Using mock data until proper endpoints are added
-        // In production, add GET /api/units/{id} that returns unit with property details
-        createMockDataFromLease()
+            override fun onFailure(call: Call<Property>, t: Throwable) {
+                showError("Network error: ${t.message}")
+            }
+        })
     }
 
     /**
-     * Creates mock unit and property data from lease
-     * TEMPORARY solution until proper API endpoints are added
-     * In production, replace this with actual API calls
+     * Fetches latest payment for this lease to determine status
      */
-    private fun createMockDataFromLease() {
-        if (currentLease == null) return
+    private fun loadLastPayment() {
+        val leaseId = currentLease?.id
+        if (leaseId == null) {
+            displayTenantData()
+            return
+        }
 
-        // Create mock unit data
-        currentUnit = Unit(
-            id = currentLease!!.unitId,
-            code = "Unit ${currentLease!!.unitId}",
-            rentAmount = 25000.0, // Default rent amount
-            propertyId = 1, // Assume property ID 1
-            createdAt = currentLease!!.createdAt,
-            updatedAt = currentLease!!.updatedAt
-        )
+        AppManager.getApiService().getPaymentHistory(leaseId).enqueue(object : Callback<List<Payment>> {
+            override fun onResponse(call: Call<List<Payment>>, response: Response<List<Payment>>) {
+                if (response.isSuccessful) {
+                    val payments = response.body().orEmpty()
+                    lastPayment = payments.firstOrNull()
+                    isRentPaid = false
 
-        // Create mock property data
-        currentProperty = Property(
-            id = 1,
-            name = "Default Property",
-            address = "Nairobi, Kenya",
-            landlordId = 1,
-            createdAt = currentLease!!.createdAt,
-            updatedAt = currentLease!!.updatedAt
-        )
+                    lastPayment?.let { payment ->
+                        val paidStatus = payment.status.equals("completed", true) || payment.status.equals("success", true)
+                        val paidDate = parseIsoDate(payment.updatedAt ?: payment.createdAt)
+                        if (paidStatus && paidDate != null) {
+                            val now = Calendar.getInstance()
+                            val paidCal = Calendar.getInstance().apply { time = paidDate }
+                            isRentPaid = paidCal.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+                                    paidCal.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+                        }
+                    }
+                }
 
-        // Display the data
-        displayTenantData()
+                displayTenantData()
+            }
+
+            override fun onFailure(call: Call<List<Payment>>, t: Throwable) {
+                // Even if payment history fails, show available data
+                displayTenantData()
+            }
+        })
     }
 
     /**
@@ -347,57 +372,80 @@ class TenantDashboardFragment : Fragment() {
         // Display property details
         tvPropertyName.text = currentProperty?.name ?: "Property"
         tvHouseNumber.text = currentUnit?.code ?: "Unit"
-        tvBedrooms.text = "2 Bedroom" // Hardcoded for now
+        tvBedrooms.text = currentProperty?.address ?: "No address on file"
         tvMonthlyRent.text = currencyFormat.format(currentUnit?.rentAmount ?: 0.0)
 
         // Calculate due date (5th of each month for example)
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, 5)
-        tvDueDate.text = "Every 5th of the month"
+        val dueDay = currentLease?.startDate?.split("-")?.lastOrNull()?.toIntOrNull() ?: 5
+        calendar.set(Calendar.DAY_OF_MONTH, dueDay)
+        tvDueDate.text = "Every ${dueDay}th of the month"
         tvDueDateDisplay.text = dateFormat.format(calendar.time)
 
-        // Update rent status card
-        updateRentStatusCard()
+        // Update rent status card based on payment
+        updateRentStatusCard(isRentPaid)
 
-        // TODO: Load and display last payment
-        // For now, hide last payment section
-        containerLastPayment.visibility = View.GONE
+        // Display last payment if available
+        lastPayment?.let { payment ->
+            containerLastPayment.visibility = View.VISIBLE
+            tvLastPaymentAmount.text = currencyFormat.format(payment.amount)
+            val paymentDate = parseIsoDate(payment.updatedAt ?: payment.createdAt)
+            tvLastPaymentDate.text = paymentDate?.let { dateFormat.format(it) } ?: payment.createdAt
+        } ?: run {
+            containerLastPayment.visibility = View.GONE
+        }
     }
 
     /**
      * Updates the rent status card based on payment status
      * Shows whether rent is paid or overdue
      */
-    private fun updateRentStatusCard() {
-        // TODO: Check actual payment status from API
-        // For now, assume rent is not paid
-        val isPaid = false
+    private fun updateRentStatusCard(isPaid: Boolean) {
+        val isPending = lastPayment?.status?.equals("pending", true) == true
 
         // Set card color based on status
-        val backgroundColor = if (isPaid) {
-            ContextCompat.getColor(requireContext(), R.color.success)
-        } else {
-            ContextCompat.getColor(requireContext(), R.color.primary_red)
+        val backgroundColor = when {
+            isPaid -> ContextCompat.getColor(requireContext(), R.color.success)
+            isPending -> ContextCompat.getColor(requireContext(), R.color.warning)
+            else -> ContextCompat.getColor(requireContext(), R.color.primary_red)
         }
         cardRentStatus.setBackgroundColor(backgroundColor)
 
         // Set status text
-        tvRentStatusTitle.text = if (isPaid) "Rent Paid" else "Rent Due"
-        tvRentStatusBadge.text = if (isPaid) "Paid" else "Unpaid"
+        tvRentStatusTitle.text = when {
+            isPaid -> "Rent Paid"
+            isPending -> "Awaiting Confirmation"
+            else -> "Rent Due"
+        }
+        tvRentStatusBadge.text = when {
+            isPaid -> "Paid"
+            isPending -> "Pending"
+            else -> "Unpaid"
+        }
 
         // Set status icon
         val iconRes = if (isPaid) R.drawable.ic_check_circle else R.drawable.ic_warning
         ivRentStatusIcon.setImageResource(iconRes)
 
         // Show/hide payment button
-        if (isPaid) {
-            btnProceedPayment.visibility = View.GONE
-            tvPaymentNotice.visibility = View.GONE
-            tvDueDateDisplay.visibility = View.GONE
-        } else {
-            btnProceedPayment.visibility = View.VISIBLE
-            tvPaymentNotice.visibility = View.VISIBLE
-            tvDueDateDisplay.visibility = View.VISIBLE
+        when {
+            isPaid -> {
+                btnProceedPayment.visibility = View.GONE
+                tvPaymentNotice.visibility = View.GONE
+                tvDueDateDisplay.visibility = View.GONE
+            }
+            isPending -> {
+                btnProceedPayment.visibility = View.GONE
+                tvPaymentNotice.visibility = View.VISIBLE
+                tvPaymentNotice.text = "Processing your payment..."
+                tvDueDateDisplay.visibility = View.VISIBLE
+            }
+            else -> {
+                btnProceedPayment.visibility = View.VISIBLE
+                tvPaymentNotice.visibility = View.VISIBLE
+                tvPaymentNotice.text = "Payment Due:"
+                tvDueDateDisplay.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -482,16 +530,27 @@ class TenantDashboardFragment : Fragment() {
     }
 
     /**
+     * Safely parse ISO date strings returned by the API
+     */
+    private fun parseIsoDate(raw: String?): Date? {
+        if (raw.isNullOrBlank()) return null
+        return try {
+            isoDateParser.parse(raw.replace("Z", ""))
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
      * Fragment lifecycle: onResume
      * Called when fragment becomes visible
      * Refresh data in case payment was made
      */
     override fun onResume() {
         super.onResume()
-        // Refresh data when returning from payment
+        // Refresh payment status when returning from checkout
         if (currentLease != null) {
-            // TODO: Refresh payment status
-            updateRentStatusCard()
+            loadLastPayment()
         }
     }
 }

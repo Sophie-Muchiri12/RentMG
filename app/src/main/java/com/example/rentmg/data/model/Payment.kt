@@ -52,7 +52,7 @@ data class Payment(
 
     // Timestamp when payment was last updated
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String?
 )
 
 /**
@@ -91,7 +91,11 @@ data class PaymentInitResponse(
 
     // Status message from backend
     @SerializedName("message")
-    val message: String?
+    val message: String?,
+
+    // CheckoutRequestID from M-Pesa (useful for debugging/polling)
+    @SerializedName("mpesa_checkout_id")
+    val mpesaCheckoutId: String?
 )
 
 /**

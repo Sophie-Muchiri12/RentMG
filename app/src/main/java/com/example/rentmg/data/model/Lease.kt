@@ -41,13 +41,17 @@ data class Lease(
     @SerializedName("status")
     val status: String,
 
+    // Property ID for the unit (helps avoid extra calls)
+    @SerializedName("property_id")
+    val propertyId: Int? = null,
+
     // Timestamp when lease was created (ISO 8601 format)
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String?,
 
     // Timestamp when lease was last updated
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String?
 )
 
 /**

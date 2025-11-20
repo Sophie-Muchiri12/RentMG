@@ -220,8 +220,8 @@ class HistoryFragment : Fragment() {
                         // Clear existing data
                         paymentHistory.clear()
 
-                        // Add new data (sorted by most recent first)
-                        paymentHistory.addAll(payments.sortedByDescending { it.createdAt })
+                        // Add new data (backend already returns newest first)
+                        paymentHistory.addAll(payments)
 
                         // Notify adapter that data changed
                         historyAdapter.notifyDataSetChanged()
@@ -346,7 +346,7 @@ class PaymentHistoryAdapter(
             // Backend sends dates in ISO 8601 format (e.g., "2025-01-15T14:30:00")
             try {
                 val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-                val date = isoFormat.parse(payment.createdAt)
+                val date = isoFormat.parse(payment.updatedAt ?: payment.createdAt)
                 tvDate.text = if (date != null) dateFormat.format(date) else payment.createdAt
             } catch (e: Exception) {
                 // If parsing fails, show raw date

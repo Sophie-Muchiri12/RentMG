@@ -386,7 +386,7 @@ class CheckoutActivity : AppCompatActivity() {
 
                                     // Check payment status
                                     when (payment.status.lowercase()) {
-                                        "completed" -> {
+                                        "completed", "success" -> {
                                             // Payment successful!
                                             showPaymentSuccess(payment)
                                             // Stop polling (don't schedule next run)

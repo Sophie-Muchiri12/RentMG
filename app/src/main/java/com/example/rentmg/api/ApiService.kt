@@ -101,6 +101,13 @@ interface ApiService {
     fun listUnitsByProperty(@Path("property_id") propertyId: Int): Call<List<Unit>>
 
     /**
+     * Get a single unit by ID
+     * Returns full unit details including property_id
+     */
+    @GET("/api/units/{id}")
+    fun getUnit(@Path("id") unitId: Int): Call<Unit>
+
+    /**
      * Create unit
      * Only landlords can create units
      * Requires authentication

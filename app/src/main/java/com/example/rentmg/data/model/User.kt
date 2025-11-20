@@ -32,11 +32,11 @@ data class User(
 
     // Timestamp when user was created (ISO 8601 format)
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String?,
 
     // Timestamp when user was last updated
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String?
 )
 
 /**
