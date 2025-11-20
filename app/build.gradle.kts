@@ -18,6 +18,7 @@ android {
 
     buildFeatures {
         compose = true  // ENABLE COMPOSE
+        viewBinding = true  // ENABLE VIEW BINDING
     }
 
     composeOptions {
@@ -35,6 +36,9 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     // Existing dependencies
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.rentmg.R
-import com.example.rentmg.auth.SignInActivity
+import com.example.rentmg.pages.auth.SignInActivity
 
 class SettingsFragment : Fragment() {
 
