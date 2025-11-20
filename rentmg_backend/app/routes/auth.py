@@ -27,7 +27,8 @@ def register():
     if User.query.filter_by(email=email).first(): return jsonify({"error":"email exists"}), 409
     user = User(email=email, password_hash=hash_password(password), role=role, full_name=data.get("full_name"))
     db.session.add(user); db.session.commit()
-    return jsonify({"message":"registered", "user": _user_payload(user)}), 201
+    token = create_access_token(identity={"id": user.id, "role": user.role})
+    return jsonify({"message":"registered", "access_token": token, "user": _user_payload(user)}), 201
 
 
 @bp.post("/login")

@@ -36,6 +36,9 @@ def list_leases():
 @bp.post("/")
 @jwt_required()
 def create_lease():
+    ident = get_jwt_identity()
+    if ident["role"] != "landlord":
+        return jsonify({"error":"only landlord"}), 403
     data = request.get_json() or {}
     start_date = data.get("start_date")
     end_date = data.get("end_date")

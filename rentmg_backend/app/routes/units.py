@@ -34,7 +34,13 @@ def get_unit(unit_id):
 @bp.post("/")
 @jwt_required()
 def create_unit():
+    ident = get_jwt_identity()
+    if ident["role"] != "landlord":
+        return jsonify({"error":"only landlord"}), 403
     data = request.get_json() or {}
+    prop = Property.query.get_or_404(data.get("property_id"))
+    if prop.landlord_id != ident["id"]:
+        return jsonify({"error":"not your property"}), 403
     u = Unit(code=data["code"], rent_amount=int(data["rent_amount"]), property_id=data["property_id"])
     db.session.add(u); db.session.commit()
     return jsonify(_serialize_unit(u)), 201
