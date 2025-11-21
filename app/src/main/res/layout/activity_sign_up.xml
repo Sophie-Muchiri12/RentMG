@@ -182,6 +182,48 @@
             android:padding="12dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Property Name (Landlord/Tenant) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/property_name_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:visibility="gone"
+            app:boxBackgroundColor="#F4F4F4"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/property_name_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Property Name"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Property Address (Landlord) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/property_address_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:visibility="gone"
+            app:boxBackgroundColor="#F4F4F4"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/property_address_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Property Address"
+                android:inputType="textMultiLine" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/password_layout"

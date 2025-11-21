@@ -1,64 +1,72 @@
 package com.example.rentmg
 
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import com.example.rentmg.databinding.ActivityMainBinding
+import com.example.rentmg.pages.auth.SignInActivity
+import com.example.rentmg.pages.auth.SignUpActivity
+import com.example.rentmg.util.AppManager
 
+/**
+ * MainActivity
+ * Landing page of the application
+ *
+ * This is the entry point activity that:
+ * - Initializes global app state and API client
+ * - Provides navigation to Sign In and Sign Up screens
+ * - Uses View Binding for type-safe view access
+ *
+ * The activity is displayed when:
+ * - App is first launched
+ * - User logs out
+ * - User clears app from back stack
+ */
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
+    // View Binding object for type-safe view access
+    // Automatically generated from activity_main.xml
     private lateinit var binding: ActivityMainBinding
 
+    /**
+     * Activity lifecycle: onCreate
+     * Called when activity is first created
+     * Initializes app manager and sets up UI
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize AppManager singleton
+        // This loads any saved JWT token and prepares API client
+        // Should be called before any API calls are made
+        AppManager.initialize(this)
+
+        // Inflate layout using View Binding
+        // This provides type-safe access to views without findViewById()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
+        // Set up button click listeners
+        setupListeners()
+    }
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
+    /**
+     * Sets up click listeners for all interactive elements
+     * Navigates to appropriate authentication screens
+     */
+    private fun setupListeners() {
+        // Sign In button - navigates to SignInActivity
+        binding.signInButton.setOnClickListener {
+            // Create intent to launch SignInActivity
+            val intent = Intent(this, SignInActivity::class.java)
+            startActivity(intent)
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                // Navigate to Settings Fragment
-                findNavController(R.id.nav_host_fragment_content_main)
-                    .navigate(R.id.SettingsFragment)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        // Sign Up button - navigates to SignUpActivity
+        binding.signUpButton.setOnClickListener {
+            // Create intent to launch SignUpActivity
+            val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
     }
 }
